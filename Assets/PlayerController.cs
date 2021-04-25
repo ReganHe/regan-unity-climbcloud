@@ -8,6 +8,7 @@ public class PlayerController : MonoBehaviour
   float jumpForce = 780.0f;
   float walkForce = 30.0f;
   float maxWalkSpeed = 2.0f;
+  float threshold = 0.2f;
 
   void Start()
   {
@@ -19,19 +20,20 @@ public class PlayerController : MonoBehaviour
   void Update()
   {
     //跳跃
-    if (Input.GetKeyDown(KeyCode.Space) && this.rigid2D.velocity.y == 0)
+    if (Input.GetMouseButtonDown(0) && this.rigid2D.velocity.y == 0)
     {
+      this.animator.SetTrigger("JumpTrigger");
       //施加一个向上的力
       this.rigid2D.AddForce(transform.up * this.jumpForce);
     }
 
     //左右移动
     int key = 0;
-    if (Input.GetKey(KeyCode.RightArrow))
+    if (Input.acceleration.x > this.threshold)
     {
       key = 1;
     }
-    if (Input.GetKey(KeyCode.LeftArrow))
+    if (Input.acceleration.x < -this.threshold)
     {
       key = -1;
     }
@@ -50,7 +52,15 @@ public class PlayerController : MonoBehaviour
     }
 
     //根据角色的移动速度改变动画的播放速度
-    this.animator.speed = speedx / 2.0f;
+    if (this.rigid2D.velocity.y == 0)
+    {
+      this.animator.speed = speedx / 2.0f;
+    }
+    else
+    {
+      this.animator.speed = 1.0f;
+    }
+
 
     //掉到画面以外就恢复到最初状态
     if (transform.position.y < -10)
